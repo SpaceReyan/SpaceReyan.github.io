@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosmic Explorer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d1117;
+            color: #c9d1d9;
+        }
+        .section-box {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+        }
+        .btn {
+            background-color: #21262d;
+            border: 1px solid #30363d;
+            color: #c9d1d9;
+            transition: all 0.3s ease;
+        }
+        .btn:hover {
+            background-color: #30363d;
+            transform: scale(1.05);
+        }
+        .quiz-option:checked + .quiz-label {
+            background-color: #2e6242; /* green-700 equivalent */
+            border-color: #4a865f;
+            transform: scale(1.02);
+        }
+        .game-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .game-control-btn {
+            background-color: #21262d;
+            border: 1px solid #30363d;
+            color: #c9d1d9;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .game-control-btn:hover {
+            background-color: #30363d;
+        }
+        canvas {
+            background-color: #000;
+            border: 1px solid #30363d;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body class="p-6 md:p-12">
+
+    <!-- Header -->
+    <header class="text-center mb-12">
+        <h1 class="text-4xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600">Cosmic Explorer</h1>
+        <p class="text-md md:text-xl text-gray-400 mt-2">Discover the universe through facts, quizzes, and games.</p>
+    </header>
+
+    <!-- General Info Section - now full width -->
+    <section id="general-info-section" class="section-box rounded-lg shadow-lg p-6 mb-8">
+        <h2 class="text-2xl font-semibold mb-4 text-blue-300">General Space Information</h2>
+        <p class="text-gray-300 leading-relaxed mb-4">
+            Space is the boundless three-dimensional extent in which objects and events have relative position and direction. It is filled with countless galaxies, stars, planets, and other celestial bodies. Our own solar system is a tiny corner of the Milky Way galaxy, which is just one of billions of galaxies in the observable universe.
+        </p>
+        <p class="text-gray-300 leading-relaxed">
+            The study of space and the universe is called astronomy. It helps us understand our place in the cosmos, the origins of our planet, and the future of humanity. From the Big Bang theory to the search for exoplanets, there is a limitless amount to explore.
+        </p>
+    </section>
+
+    <main class="flex flex-col lg:flex-row gap-8">
+
+        <!-- Left Column (Information & Quiz) -->
+        <div class="lg:w-1/2 flex flex-col gap-8">
+
+            <!-- Information Section -->
+            <section id="info-section" class="section-box rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-semibold mb-4 text-blue-300">Space Facts</h2>
+                <p class="text-gray-300 leading-relaxed mb-4">
+                    The cosmos is a vast and mysterious place filled with incredible wonders. From the swirling nebulae where stars are born to the enigmatic black holes that warp spacetime, there's always something new to learn.
+                </p>
+                <ul class="list-disc list-inside space-y-2 text-gray-400">
+                    <li>The Sun is a star, and it is just one of over 100 billion stars in our Milky Way galaxy.</li>
+                    <li>A light-year is a unit of distance, not time. It's the distance light travels in one year, which is about 9.46 trillion kilometers.</li>
+                    <li>Jupiter's Great Red Spot is a gigantic storm larger than Earth that has been raging for at least 350 years.</li>
+                    <li>There are more stars in the universe than grains of sand on all the beaches on Earth.</li>
+                </ul>
+            </section>
+
+            <!-- Quiz Section -->
+            <section id="quiz-section" class="section-box rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-semibold mb-4 text-blue-300">Space Quiz</h2>
+                <div id="quiz-container">
+                    <!-- Quiz questions will be dynamically inserted here by JavaScript -->
+                </div>
+                <div id="quiz-results" class="hidden mt-4 text-center">
+                    <p id="quiz-score" class="text-xl font-bold"></p>
+                    <p id="quiz-message" class="text-lg mt-2"></p>
+                </div>
+                <button id="submit-quiz-btn" class="btn w-full mt-6 py-2 rounded-md font-semibold hover:bg-gray-700">Submit Answers</button>
+            </section>
+
+        </div>
+
+        <!-- Right Column (Game) -->
+        <div class="lg:w-1/2 section-box rounded-lg shadow-lg p-6 flex flex-col items-center">
+            <h2 class="text-2xl font-semibold mb-4 text-blue-300">Space Blaster Game</h2>
+            <canvas id="gameCanvas" class="rounded-lg shadow-xl"></canvas>
+            <div id="game-info" class="text-center mt-4">
+                <div id="game-stats" class="text-lg font-bold">Score: <span id="score-display">0</span></div>
+                <p id="game-message" class="mt-2 text-gray-400">Press 'Start' to begin!</p>
+            </div>
+            <div id="game-controls" class="game-controls">
+                <button id="startGameBtn" class="game-control-btn hover:bg-green-600">Start Game</button>
+                <button id="pauseGameBtn" class="game-control-btn hover:bg-yellow-600 hidden">Pause Game</button>
+                <button id="restartGameBtn" class="game-control-btn hover:bg-red-600 hidden">Restart</button>
+            </div>
+            
+            <!-- How to Play Section -->
+            <div id="how-to-play" class="text-center mt-6">
+                <h3 class="text-xl font-semibold text-gray-300 mb-2">How to Play</h3>
+                <p class="text-gray-400">
+                    Use the 'Left' and 'Right' arrow keys (or 'A' and 'D') to move your ship.
+                    Press the 'F' key to shoot and destroy incoming asteroids.
+                    Avoid colliding with the asteroids to survive!
+                </p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Video Section -->
+    <section id="video-section" class="section-box rounded-lg shadow-lg p-6 mt-8">
+        <h2 class="text-2xl font-semibold mb-4 text-blue-300">Learn Basisc of Space from a video</h2>
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/TBUavlPXPw4?si=1Sca8Ghlymv9jvhB"
+             title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture;
+              web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </section>
+
+    <!-- JavaScript for Quiz and Game -->
+    <script>
+        // Quiz Data
+        const quizQuestions = [
+            {
+                question: "What is the largest planet in our solar system?",
+                options: ["Earth", "Jupiter", "Mars", "Saturn"],
+                answer: "Jupiter"
+            },
+            {
+                question: "Which galaxy is Earth located in?",
+                options: ["Andromeda", "Triangulum", "Pinwheel", "Milky Way"],
+                answer: "Milky Way"
+            },
+            {
+                question: "What is the name of the first human to walk on the moon?",
+                options: ["Buzz Aldrin", "Yuri Gagarin", "Neil Armstrong", "Michael Collins"],
+                answer: "Neil Armstrong"
+            },
+            {
+                question: "Which of these is NOT a dwarf planet?",
+                options: ["Pluto", "Eris", "Ceres", "Neptune"],
+                answer: "Neptune"
+            }
+        ];
+
+        // Quiz Logic
+        const quizContainer = document.getElementById('quiz-container');
+        const submitQuizBtn = document.getElementById('submit-quiz-btn');
+        const quizResults = document.getElementById('quiz-results');
+        const quizScoreDisplay = document.getElementById('quiz-score');
+        const quizMessage = document.getElementById('quiz-message');
+
+        function renderQuiz() {
+            quizQuestions.forEach((q, index) => {
+                const questionHtml = `
+                    <div class="mb-4">
+                        <p class="text-lg font-medium mb-2">${index + 1}. ${q.question}</p>
+                        <div class="flex flex-wrap gap-2">
+                            ${q.options.map(option => `
+                                <div class="flex items-center">
+                                    <input type="radio" id="q${index}-opt${option}" name="question-${index}" value="${option}" class="hidden quiz-option">
+                                    <label for="q${index}-opt${option}" class="quiz-label block cursor-pointer px-4 py-2 rounded-md text-gray-300 border border-gray-600 hover:bg-gray-700 transition-colors duration-200">
+                                        ${option}
+                                    </label>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+                quizContainer.innerHTML += questionHtml;
+            });
+        }
+
+        submitQuizBtn.addEventListener('click', () => {
+            let score = 0;
+            quizQuestions.forEach((q, index) => {
+                const selectedOption = document.querySelector(`input[name="question-${index}"]:checked`);
+                if (selectedOption && selectedOption.value === q.answer) {
+                    score++;
+                }
+            });
+
+            quizScoreDisplay.textContent = `You scored ${score} out of ${quizQuestions.length}!`;
+            if (score === quizQuestions.length) {
+                quizMessage.textContent = "🚀 You're a true Cosmic Explorer!";
+                quizMessage.classList.add('text-green-500');
+            } else if (score > quizQuestions.length / 2) {
+                quizMessage.textContent = "🌠 Good job! You know a lot about space.";
+                quizMessage.classList.add('text-yellow-500');
+            } else {
+                quizMessage.textContent = "🌌 Keep exploring! There's so much more to learn.";
+                quizMessage.classList.add('text-red-500');
+            }
+            quizResults.classList.remove('hidden');
+            submitQuizBtn.disabled = true;
+            submitQuizBtn.textContent = "Quiz Complete";
+        });
+
+        // Game Logic
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreDisplay = document.getElementById('score-display');
+        const gameMessage = document.getElementById('game-message');
+        const startGameBtn = document.getElementById('startGameBtn');
+        const pauseGameBtn = document.getElementById('pauseGameBtn');
+        const restartGameBtn = document.getElementById('restartGameBtn');
+
+        let game;
+        let animationFrameId;
+        
+        // This function will resize the canvas
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            canvas.width = container.offsetWidth - 32; // -32 for padding
+            canvas.height = Math.min(window.innerHeight * 0.7, canvas.width * 0.7); // Cap height for smaller screens
+        }
+        
+        // Ensure the canvas is sized correctly right at the beginning
+        resizeCanvas();
+
+        // Game State and Objects
+        class Game {
+            constructor() {
+                this.score = 0;
+                this.isPaused = false;
+                this.isPlaying = false;
+                this.player = null;
+                this.bullets = [];
+                this.asteroids = [];
+                this.lastAsteroidTime = 0;
+                this.asteroidInterval = 1000;
+                this.asteroidSpeed = 1;
+                this.messageBox = {
+                    text: '',
+                    visible: false,
+                    color: 'white',
+                };
+            }
+
+            init() {
+                this.score = 0;
+                this.isPaused = false;
+                this.isPlaying = true;
+                this.player = new Player();
+                this.bullets = [];
+                this.asteroids = [];
+                this.lastAsteroidTime = Date.now();
+                this.asteroidInterval = 1000;
+                this.asteroidSpeed = 1;
+                scoreDisplay.textContent = '0';
+                gameMessage.textContent = '';
+                this.hideMessageBox();
+                this.loop();
+                startGameBtn.classList.add('hidden');
+                pauseGameBtn.classList.remove('hidden');
+                pauseGameBtn.textContent = 'Pause Game';
+                restartGameBtn.classList.add('hidden');
+            }
+
+            loop() {
+                if (!this.isPlaying || this.isPaused) return;
+
+                const now = Date.now();
+                if (now - this.lastAsteroidTime > this.asteroidInterval) {
+                    this.spawnAsteroid();
+                    this.lastAsteroidTime = now;
+                    this.asteroidInterval = Math.max(200, this.asteroidInterval - 10);
+                    this.asteroidSpeed = Math.min(5, this.asteroidSpeed + 0.05);
+                }
+
+                this.update();
+                this.draw();
+
+                animationFrameId = requestAnimationFrame(() => this.loop());
+            }
+
+            update() {
+                this.player.update();
+                this.bullets.forEach(b => b.update());
+                this.asteroids.forEach(a => a.update());
+
+                // Collision detection (bullets vs asteroids)
+                this.bullets = this.bullets.filter(bullet => {
+                    const hitAsteroid = this.asteroids.findIndex(asteroid => {
+                        const distance = Math.sqrt(
+                            (bullet.x - asteroid.x) ** 2 +
+                            (bullet.y - asteroid.y) ** 2
+                        );
+                        return distance < (asteroid.size / 2) + 5;
+                    });
+
+                    if (hitAsteroid > -1) {
+                        this.asteroids.splice(hitAsteroid, 1);
+                        this.score += 10;
+                        scoreDisplay.textContent = this.score;
+                        return false; // remove the bullet
+                    }
+                    return bullet.y > 0; // keep the bullet if it's on screen
+                });
+
+                // Collision detection (player vs asteroids)
+                this.asteroids.forEach(asteroid => {
+                    const distance = Math.sqrt(
+                        (this.player.x - asteroid.x) ** 2 +
+                        (this.player.y - asteroid.y) ** 2
+                    );
+                    if (distance < (asteroid.size / 2) + 15) {
+                        this.gameOver();
+                    }
+                });
+
+                // Remove off-screen asteroids
+                this.asteroids = this.asteroids.filter(a => a.y < canvas.height);
+            }
+
+            draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                this.player.draw();
+                this.bullets.forEach(b => b.draw());
+                this.asteroids.forEach(a => a.draw());
+
+                if (this.isPaused) {
+                    this.showMessageBox("PAUSED", "yellow");
+                }
+                if (this.messageBox.visible) {
+                    this.drawMessageBox();
+                }
+            }
+
+            spawnAsteroid() {
+                const x = Math.random() * canvas.width;
+                const size = 20 + Math.random() * 30;
+                this.asteroids.push(new Asteroid(x, -size, size, this.asteroidSpeed));
+            }
+
+            gameOver() {
+                this.isPlaying = false;
+                cancelAnimationFrame(animationFrameId);
+                this.showMessageBox("GAME OVER", "red");
+                gameMessage.textContent = `Final Score: ${this.score}`;
+                startGameBtn.classList.remove('hidden');
+                startGameBtn.textContent = 'Play Again';
+                pauseGameBtn.classList.add('hidden');
+                restartGameBtn.classList.remove('hidden');
+            }
+
+            togglePause() {
+                this.isPaused = !this.isPaused;
+                pauseGameBtn.textContent = this.isPaused ? 'Resume Game' : 'Pause Game';
+                if (!this.isPaused) {
+                    this.hideMessageBox();
+                    this.loop();
+                }
+            }
+
+            showMessageBox(text, color) {
+                this.messageBox.text = text;
+                this.messageBox.color = color;
+                this.messageBox.visible = true;
+            }
+
+            hideMessageBox() {
+                this.messageBox.visible = false;
+            }
+
+            drawMessageBox() {
+                ctx.font = "bold 48px Inter";
+                ctx.fillStyle = this.messageBox.color;
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText(this.messageBox.text, canvas.width / 2, canvas.height / 2);
+            }
+        }
+
+        class Player {
+            constructor() {
+                this.x = canvas.width / 2;
+                this.y = canvas.height - 50;
+                this.size = 30;
+                this.speed = 7;
+                this.dx = 0;
+            }
+
+            update() {
+                this.x += this.dx;
+                if (this.x < 0) this.x = 0;
+                if (this.x + this.size > canvas.width) this.x = canvas.width - this.size;
+            }
+            
+            // This method was missing! It draws the ship on the canvas.
+            draw() {
+                ctx.fillStyle = '#e5ff30';
+                ctx.beginPath();
+                ctx.moveTo(this.x, this.y);
+                ctx.lineTo(this.x + this.size / 2, this.y - this.size);
+                ctx.lineTo(this.x + this.size, this.y);
+                ctx.lineTo(this.x, this.y);
+                ctx.fill();
+            }
+
+            shoot() {
+                const bullet = new Bullet(this.x + this.size / 2, this.y);
+                game.bullets.push(bullet);
+            }
+        }
+
+        class Bullet {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.speed = 10;
+            }
+
+            update() {
+                this.y -= this.speed;
+            }
+
+            draw() {
+                ctx.fillStyle = '#e5ff30';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        class Asteroid {
+            constructor(x, y, size, speed) {
+                this.x = x;
+                this.y = y;
+                this.size = size;
+                this.speed = speed;
+            }
+
+            update() {
+                this.y += this.speed;
+            }
+
+            draw() {
+                ctx.fillStyle = '#8f9ba8';
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size / 2, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        // Event Listeners for Game
+        document.addEventListener('keydown', (e) => {
+            if (!game || !game.isPlaying) return;
+            if (e.key === 'ArrowLeft' || e.key === 'a') {
+                game.player.dx = -game.player.speed;
+            } else if (e.key === 'ArrowRight' || e.key === 'd') {
+                game.player.dx = game.player.speed;
+            } else if (e.key === 'f' && !game.isPaused) {
+                game.player.shoot();
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            if (!game || !game.isPlaying) return;
+            if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'ArrowRight' || e.key === 'd') {
+                game.player.dx = 0;
+            }
+        });
+
+        startGameBtn.addEventListener('click', () => {
+            if (!game) {
+                game = new Game();
+            }
+            game.init();
+        });
+
+        pauseGameBtn.addEventListener('click', () => {
+            if (game && game.isPlaying) {
+                game.togglePause();
+            }
+        });
+
+        restartGameBtn.addEventListener('click', () => {
+            game = new Game();
+            game.init();
+        });
+
+        // Add event listener for window resize
+        window.addEventListener('resize', resizeCanvas);
+
+        // Initial setup
+        window.onload = function() {
+            renderQuiz();
+        }
+
+    </script>
+</body>
+</html>
