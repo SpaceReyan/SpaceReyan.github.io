@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML for Beginners</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .container {
+            max-width: 900px;
+        }
+        .code-block {
+            background-color: #1e293b;
+            color: #e2e8f0;
+            border-left: 4px solid #6366f1;
+            font-family: monospace;
+            overflow-x: auto;
+        }
+        .html-preview {
+            border: 1px dashed #9ca3af;
+            background-color: #ffffff;
+            min-height: 150px;
+        }
+        .card {
+            background-color: #ffffff;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-6 sm:p-12">
+
+    <!-- Main Container -->
+    <div class="container mx-auto">
+        <div class="text-center mb-10">
+            <h1 class="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-2">HTML for Beginners</h1>
+            <p class="text-gray-600 text-lg sm:text-xl">A simple and interactive guide to get you started with HyperText Markup Language.</p>
+        </div>
+
+        <!-- Section 1: What is HTML? -->
+        <div class="card p-6 sm:p-8 rounded-xl mb-8">
+            <h2 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-4">1. What is HTML?</h2>
+            <p class="text-gray-700 leading-relaxed mb-4">
+                HTML stands for HyperText Markup Language. It's the standard language for creating web pages.
+                Think of it as the **skeleton of a webpage**—it provides the structure and content.
+            </p>
+            <p class="text-gray-700 leading-relaxed">
+                HTML uses "tags" to mark up different parts of the content, like headings, paragraphs, and lists. These tags are enclosed in angle brackets, for example, <code>&lt;p&gt;</code> for a paragraph.
+            </p>
+        </div>
+
+        <!-- Section 2: Basic Document Structure -->
+        <div class="card p-6 sm:p-8 rounded-xl mb-8">
+            <h2 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-4">2. Basic Document Structure</h2>
+            <p class="text-gray-700 leading-relaxed mb-4">
+                Every HTML page follows a basic structure. Copy and paste the code below into an editor to see it in action.
+            </p>
+            <div class="code-block p-4 rounded-lg mb-4">
+                <pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;title&gt;My First Page&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;Hello, World!&lt;/h1&gt;
+    &lt;p&gt;This is my first paragraph.&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+                </code></pre>
+            </div>
+            <p class="text-gray-700 leading-relaxed">
+                This code defines the core parts of a page: the `html` tag for the whole document, the `head` for metadata, and the `body` where all the visible content goes.
+            </p>
+        </div>
+
+        <!-- Section 3: Common Tags -->
+        <div class="card p-6 sm:p-8 rounded-xl mb-8">
+            <h2 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-4">3. Common HTML Tags</h2>
+            <p class="text-gray-700 leading-relaxed mb-4">
+                Let's explore some of the most frequently used tags.
+            </p>
+
+            <!-- Headings -->
+            <div class="p-4 bg-gray-50 rounded-lg mb-4 border border-gray-200">
+                <h3 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-2">Headings: &lt;h1&gt; to &lt;h6&gt;</h3>
+                <p class="text-gray-700 mb-2">Used for titles and subtitles. `&lt;h1&gt;` is the most important.</p>
+                <div class="html-preview p-4 rounded-lg">
+                    <h1>This is an h1 heading</h1>
+                    <h2>This is an h2 heading</h2>
+                </div>
+            </div>
+
+            <!-- Paragraphs -->
+            <div class="p-4 bg-gray-50 rounded-lg mb-4 border border-gray-200">
+                <h3 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-2">Paragraphs: &lt;p&gt;</h3>
+                <p class="text-gray-700 mb-2">Used for blocks of text.</p>
+                <div class="html-preview p-4 rounded-lg">
+                    <p>This is a simple paragraph of text. It's great for writing content.</p>
+                </div>
+            </div>
+
+            <!-- Links -->
+            <div class="p-4 bg-gray-50 rounded-lg mb-4 border border-gray-200">
+                <h3 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-2">Links: &lt;a&gt;</h3>
+                <p class="text-gray-700 mb-2">Used to create hyperlinks to other pages. The `href` attribute specifies the destination.</p>
+                <div class="html-preview p-4 rounded-lg">
+                    <a href="https://www.google.com" target="_blank" class="text-indigo-600 hover:underline">Click me to go to Google!</a>
+                </div>
+            </div>
+
+            <!-- Images -->
+            <div class="p-4 bg-gray-50 rounded-lg mb-4 border border-gray-200">
+                <h3 class="text-xl sm:text-2xl font-semibold text-gray-800 mb-2">Images: &lt;img&gt;</h3>
+                <p class="text-gray-700 mb-2">Used to embed images. The `src` attribute is the image's source URL, and `alt` provides alternative text.</p>
+                <div class="html-preview p-4 flex justify-center items-center rounded-lg">
+                    <img src="https://placehold.co/150x100/6366f1/ffffff?text=Image" alt="A placeholder image" class="rounded-lg">
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Section 4: Your Turn! -->
+        <div class="card p-6 sm:p-8 rounded-xl">
+            <h2 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-4">4. Your Turn!</h2>
+            <p class="text-gray-700 leading-relaxed mb-4">
+                Now you can try it yourself! Edit the code in the text area below and click "Update Preview" to see your changes.
+            </p>
+            <textarea id="live-editor" class="w-full h-48 p-4 border rounded-lg bg-gray-800 text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono" spellcheck="false">&lt;h3&gt;My Awesome Creation&lt;/h3&gt;
+&lt;p&gt;Change this text to whatever you like!&lt;/p&gt;
+&lt;a href="#"&gt;A link to nowhere&lt;/a&gt;</textarea>
+            <button onclick="updatePreview()" class="mt-4 w-full sm:w-auto px-6 py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition-colors">
+                Update Preview
+            </button>
+            <div id="live-preview" class="html-preview p-4 mt-4 rounded-lg">
+                <h3>My Awesome Creation</h3>
+                <p>Change this text to whatever you like!</p>
+                <a href="#">A link to nowhere</a>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function updatePreview() {
+            const editor = document.getElementById('live-editor');
+            const preview = document.getElementById('live-preview');
+            preview.innerHTML = editor.value;
+        }
+    </script>
+</body>
+</html>
