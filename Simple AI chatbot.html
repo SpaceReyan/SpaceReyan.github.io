@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple AI Chatbot</title>
+    <!-- Load Tailwind CSS for modern styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /*
+          Use the 'Inter' font for a clean and professional look.
+          This is the default for Tailwind's font-sans.
+        */
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s ease;
+        }
+
+        /* Custom scrollbar styling for the chat container */
+        .chat-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        .chat-container::-webkit-scrollbar-track {
+            background: #1f2937; /* bg-gray-800 */
+            border-radius: 10px;
+        }
+        .chat-container::-webkit-scrollbar-thumb {
+            background: #4b5563; /* bg-gray-600 */
+            border-radius: 10px;
+        }
+        .chat-container::-webkit-scrollbar-thumb:hover {
+            background: #6b7280; /* bg-gray-500 */
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 flex items-center justify-center min-h-screen p-4">
+
+    <!-- Main chat application container -->
+    <div class="bg-gray-800 rounded-3xl shadow-2xl w-full max-w-lg flex flex-col h-[80vh] sm:h-[70vh]">
+
+        <!-- Header for the chat interface -->
+        <header class="bg-gray-700 text-gray-200 p-4 rounded-t-3xl text-center">
+            <h1 class="text-2xl font-bold">Simple Chatbot</h1>
+            <p class="text-sm text-gray-400">Ask me anything!(Not really tho)</p>
+        </header>
+
+        <!-- Chat messages display area -->
+        <main id="chat-box" class="flex-1 p-6 overflow-y-auto chat-container space-y-4">
+            <!-- Initial message from the chatbot -->
+            <div class="flex justify-start">
+                <div class="bg-blue-600 text-white p-3 rounded-2xl rounded-bl-none max-w-[80%] shadow-lg">
+                    <p>Hello! I'm a simple chatbot. How can I help you today?</p>
+                </div>
+            </div>
+        </main>
+
+        <!-- User input area -->
+        <footer class="p-4 bg-gray-700 rounded-b-3xl flex items-center gap-2">
+            <input id="user-input" type="text" placeholder="Type your message..." class="flex-1 p-3 rounded-full bg-gray-600 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200">
+            <button id="send-button" class="bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200">
+                <!-- Send button icon (inline SVG) -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transform rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
+            </button>
+        </footer>
+    </div>
+
+    <script>
+        // Get references to the HTML elements
+        const chatBox = document.getElementById('chat-box');
+        const userInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button');
+
+        // This is the core logic, or "brain," of our simple AI.
+        // It's a map of keywords to predefined responses.
+        const botResponses = {
+            'hello': 'Hello there! How can I assist you?',
+            'hi': 'Hi! It\'s nice to chat with you.',
+            'how are you': 'I am a computer program, but thank you for asking!',
+            'joke': 'Why don\'t scientists trust atoms? Because they make up everything!',
+            'name': 'I don\'t have a name, but you can call me Bot.',
+            'help': 'I can answer simple questions, tell a joke, or just say hello.',
+            'thanks': 'You\'re welcome!',
+            'bye': 'Goodbye! Have a great day!',
+            'what can you do': 'I can tell you a joke, say hello, or answer simple questions.',
+            'weather': 'I am not connected to the internet, so I can\'t tell you the weather right now.',
+        };
+
+        /**
+         * Appends a new message to the chat box.
+         * @param {string} message - The text of the message to display.
+         * @param {string} sender - The sender, either 'user' or 'bot'.
+         */
+        function addMessageToChat(message, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('flex');
+
+            if (sender === 'user') {
+                messageDiv.classList.add('justify-end');
+                messageDiv.innerHTML = `
+                    <div class="bg-gray-600 text-gray-100 p-3 rounded-2xl rounded-br-none max-w-[80%] shadow-lg">
+                        <p>${message}</p>
+                    </div>
+                `;
+            } else { // sender === 'bot'
+                messageDiv.classList.add('justify-start');
+                messageDiv.innerHTML = `
+                    <div class="bg-blue-600 text-white p-3 rounded-2xl rounded-bl-none max-w-[80%] shadow-lg">
+                        <p>${message}</p>
+                    </div>
+                `;
+            }
+
+            chatBox.appendChild(messageDiv);
+            // Scroll to the bottom of the chat box to show the latest message
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        /**
+         * Generates a response from the bot based on user input.
+         * @param {string} userText - The user's input message.
+         * @returns {string} The bot's response.
+         */
+        function getBotResponse(userText) {
+            // Convert the user's input to lowercase for case-insensitive matching
+            const processedText = userText.toLowerCase();
+
+            // Check if any of the predefined keywords are in the user's message
+            for (const key in botResponses) {
+                if (processedText.includes(key)) {
+                    return botResponses[key];
+                }
+            }
+
+            // If no keywords are found, provide a generic response
+            return 'I\'m sorry, I don\'t understand that. Can you ask me something else?';
+        }
+
+        /**
+         * Handles the user's message submission.
+         */
+        function handleUserMessage() {
+            const userText = userInput.value.trim();
+            if (userText === '') {
+                return; // Do nothing if the input is empty
+            }
+
+            // Display the user's message
+            addMessageToChat(userText, 'user');
+
+            // Clear the input field for the next message
+            userInput.value = '';
+
+            // Get the bot's response and display it after a short delay to simulate "thinking"
+            setTimeout(() => {
+                const botReply = getBotResponse(userText);
+                addMessageToChat(botReply, 'bot');
+            }, 500); // 500 milliseconds (0.5 seconds) delay
+        }
+
+        // Add event listeners for the send button and the Enter key
+        sendButton.addEventListener('click', handleUserMessage);
+        userInput.addEventListener('keypress', (event) => {
+            // Check if the 'Enter' key was pressed
+            if (event.key === 'Enter') {
+                handleUserMessage();
+            }
+        });
+    </script>
+</body>
+</html>
