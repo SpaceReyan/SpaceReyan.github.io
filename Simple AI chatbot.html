@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple AI Chatbot</title>
+    <!-- Load Tailwind CSS for modern styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /*
+          Use the 'Inter' font for a clean and professional look.
+          This is the default for Tailwind's font-sans.
+        */
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s ease;
+        }
+
+        /* Custom scrollbar styling for the chat container */
+        .chat-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        .chat-container::-webkit-scrollbar-track {
+            background: #1f2937; /* bg-gray-800 */
+            border-radius: 10px;
+        }
+        .chat-container::-webkit-scrollbar-thumb {
+            background: #4b5563; /* bg-gray-600 */
+            border-radius: 10px;
+        }
+        .chat-container::-webkit-scrollbar-thumb:hover {
+            background: #6b7280; /* bg-gray-500 */
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 flex items-center justify-center min-h-screen p-4">
+
+    <!-- Main chat application container -->
+    <div class="bg-gray-800 rounded-3xl shadow-2xl w-full max-w-lg flex flex-col h-[80vh] sm:h-[70vh]">
+
+        <!-- Header for the chat interface -->
+        <header class="bg-gray-700 text-gray-200 p-4 rounded-t-3xl text-center">
+            <h1 class="text-2xl font-bold">Simple Chatbot</h1>
+            <p class="text-sm text-gray-400">Ask me a question, a riddle, or type 'menu' to see what I can do!</p>
+        </header>
+
+        <!-- Chat messages display area -->
+        <main id="chat-box" class="flex-1 p-6 overflow-y-auto chat-container space-y-4">
+            <!-- Initial message from the chatbot -->
+            <div class="flex justify-start">
+                <div class="bg-blue-600 text-white p-3 rounded-2xl rounded-bl-none max-w-[80%] shadow-lg">
+                    <p>Hello! I'm a simple chatbot. How can I help you today? Type 'menu' to see a list of topics I can discuss.</p>
+                </div>
+            </div>
+        </main>
+
+        <!-- User input area -->
+        <footer class="p-4 bg-gray-700 rounded-b-3xl flex items-center gap-2">
+            <input id="user-input" type="text" placeholder="Type your message..." class="flex-1 p-3 rounded-full bg-gray-600 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200">
+            <button id="send-button" class="bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200">
+                <!-- Send button icon (inline SVG) -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transform rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
+            </button>
+        </footer>
+    </div>
+
+    <script>
+        // Get references to the HTML elements
+        const chatBox = document.getElementById('chat-box');
+        const userInput = document.getElementById('user-input');
+        const sendButton = document.getElementById('send-button');
+
+        // This is the core logic, or "brain," of our simple AI.
+        // It's a map of keywords to predefined responses.
+        const botResponses = {
+            'menu': 'MENU:\n- Greetings (hi, hello)\n- Riddles (riddle)\n- Jokes & Fun Facts (joke, fact)\n- General Info (time, date)\n- Science & Tech (AI, internet)\n- Self-Care (stressed, bored)',
+            'hello': 'Hello there! How can I assist you?',
+            'hi': 'Hi! It\'s nice to chat with you.',
+            'hey': 'Hey!',
+            'how are you': 'I am a computer program, but thank you for asking! I\'m running smoothly.',
+            'what is your name': 'I don\'t have a name, but you can call me Bot.',
+            'joke': 'Why don\'t scientists trust atoms? Because they make up everything!',
+            'another joke': 'What do you call a fake noodle? An Impasta!',
+            'tell me a fact': 'The total weight of all the ants on Earth is estimated to be equal to the total weight of all the humans on Earth.',
+            'who are you': 'I am a simple chatbot created with HTML, CSS (Tailwind), and JavaScript. My knowledge is limited to my programmed responses.',
+            'what can you do': 'I can answer simple questions, tell you a joke or a fun fact, and now I can even challenge you with a riddle! Type \'menu\' for a full list.',
+            'thanks': 'You\'re very welcome!',
+            'thank you': 'You\'re welcome! It was a pleasure to assist you.',
+            'bye': 'Goodbye! Have a great day!',
+            'goodbye': 'Goodbye! Stay safe!',
+            'time': `The current time is ${new Date().toLocaleTimeString()}.`,
+            'date': `The current date is ${new Date().toLocaleDateString()}.`,
+            'what is ai': 'AI stands for Artificial Intelligence. It\'s a field of computer science dedicated to creating systems that can perform tasks that would normally require human intelligence.',
+            'what is the internet': 'The Internet is a global network of interconnected computer networks that communicate using a standard set of protocols.',
+            'who invented the telephone': 'Alexander Graham Bell is widely credited with inventing the telephone.',
+            'what is the capital of france': 'The capital of France is Paris.',
+            'who wrote the book 1984': 'The dystopian novel 1984 was written by George Orwell.',
+            'what is the largest animal': 'The largest animal on Earth is the blue whale.',
+            'what is the powerhouse of the cell': 'Mitochondria are often referred to as the powerhouse of the cell because they generate most of the energy needed to power the cell\'s biochemical reactions.',
+            'what is the speed of light': 'The speed of light in a vacuum is approximately 299,792 kilometers per second (or about 186,282 miles per second).',
+            'what is photosynthesis': 'Photosynthesis is the process used by plants, algae, and certain bacteria to convert light energy into chemical energy.',
+            'how does a computer work': 'A computer fundamentally works by processing instructions from a program, performing calculations, and storing and retrieving data.',
+            'what is the moon made of': 'The Moon\'s crust and mantle are made up of rock, and its core is a mix of iron and nickel.',
+            'what is html': 'HTML stands for HyperText Markup Language. It\'s the standard language used to create web pages and web applications.',
+            'what is css': 'CSS stands for Cascading Style Sheets. It\'s used to style the look and feel of a web page.',
+            'what is javascript': 'JavaScript is a programming language that makes web pages interactive, allowing for dynamic content and user engagement.',
+            'what is gravity': 'Gravity is a fundamental force of nature that causes objects to be attracted to one another.',
+            'what is a black hole': 'A black hole is a region of spacetime where gravity is so strong that nothing—no particles or even electromagnetic radiation such as light—can escape from it.',
+            'what is the solar system': 'The Solar System consists of the Sun and the celestial objects gravitationally bound to it, including planets, moons, asteroids, and comets.',
+            'what is dna': 'DNA, or deoxyribonucleic acid, is the molecule that carries genetic instructions for the development, functioning, growth, and reproduction of all known organisms and many viruses.',
+            'what is climate change': 'Climate change is a long-term shift in global or regional climate patterns, often attributed to the increased levels of atmospheric carbon dioxide produced by the use of fossil fuels.',
+            'how do planes fly': 'Planes fly primarily due to the lift force generated by their wings, which is created by the flow of air over their curved surfaces. This is described by Bernoulli\'s principle and Newton\'s laws of motion.',
+            'what is an ecosystem': 'An ecosystem is a community of living organisms in conjunction with the non-living components of their environment, interacting as a system.',
+            'what is a volcano': 'A volcano is a vent in the Earth\'s crust from which molten rock (magma), hot ash, and gases escape from below the surface.',
+            'what is the human heart': 'The human heart is a muscular organ that pumps blood through the body\'s circulatory system.',
+            'what is the human brain': 'The brain is the most complex organ in the human body, serving as the center of the nervous system and controlling thought, memory, emotion, and bodily functions.',
+            'what is a computer virus': 'A computer virus is a type of malicious software that, when executed, replicates itself by modifying other computer programs and inserting its own code.',
+            'how do phones work': 'Phones work by converting sound into electrical signals, which are then transmitted to a receiver that converts the signals back into sound.',
+            'how to stay healthy': 'Staying healthy involves a balanced diet, regular exercise, sufficient sleep, and managing stress.',
+            'i am bored': 'Why not try a new hobby like drawing, coding, or learning a musical instrument?',
+            'i am stressed': 'Try taking a few deep breaths, going for a short walk, or listening to some relaxing music.',
+            'i need a quote': '“The only way to do great work is to love what you do.” – Steve Jobs',
+            'what is your favorite color': 'As a bot, I don\'t have a favorite color, but I do think blue looks good on a chat interface.',
+            'what is the square root of 9': 'The square root of 9 is 3.',
+            'what is the pythagorean theorem': 'The Pythagorean theorem states that in a right-angled triangle, the square of the hypotenuse is equal to the sum of the squares of the other two sides ($a^2 + b^2 = c^2$).',
+            'what is the largest ocean': 'The largest ocean on Earth is the Pacific Ocean.',
+            'how many planets are in the solar system': 'There are eight planets in our Solar System: Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus, and Neptune.',
+            'who discovered gravity': 'Sir Isaac Newton developed the theory of universal gravitation, though the concept had been discussed by others before him.',
+            'what is the ozone layer': 'The ozone layer is a region of Earth\'s stratosphere that absorbs most of the Sun\'s ultraviolet radiation.',
+            'what is a supernova': 'A supernova is a powerful and luminous stellar explosion.',
+            'how do you make a fire': 'Making a fire requires three elements: fuel, oxygen, and heat. This is known as the "fire triangle".',
+            'what is a constellation': 'A constellation is an area on the celestial sphere in which a group of visible stars forms a perceived outline or pattern.',
+            'what is a glacier': 'A glacier is a persistent body of dense ice that is constantly moving under its own weight.',
+            'what is an atom': 'An atom is the smallest unit of ordinary matter that forms a chemical element.',
+            'what is a black hole': 'A black hole is a region of spacetime where gravity is so strong that nothing, not even light, can escape.',
+            'what is the nervous system': 'The nervous system is a complex network of nerves and cells that carry messages to and from the brain and spinal cord to various parts of the body.',
+            'what is a mineral': 'A mineral is a naturally occurring, inorganic solid with a definite chemical composition and a crystal structure.',
+            'what is the water cycle': 'The water cycle describes the continuous movement of water on, above, and below the surface of the Earth.',
+        };
+
+        // Array of riddles and their answers
+        const riddles = [
+            {
+                riddle: 'I speak without a mouth and hear without ears. I have no body, but I come alive with wind. What am I?',
+                answer: 'an echo'
+            },
+            {
+                riddle: 'What has an eye, but cannot see?',
+                answer: 'a needle'
+            },
+            {
+                riddle: 'What has to be broken before you can use it?',
+                answer: 'an egg'
+            },
+            {
+                riddle: 'What is full of holes but still holds water?',
+                answer: 'a sponge'
+            },
+            {
+                riddle: 'What question can you never answer yes to?',
+                answer: 'are you asleep yet'
+            },
+            {
+                riddle: 'What has a neck but no head?',
+                answer: 'a bottle'
+            }
+        ];
+
+        let isRiddleActive = false;
+        let currentRiddleIndex = -1;
+
+        /**
+         * Appends a new message to the chat box.
+         * @param {string} message - The text of the message to display.
+         * @param {string} sender - The sender, either 'user' or 'bot'.
+         */
+        function addMessageToChat(message, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('flex');
+            
+            // Format the message content, converting newlines to <br> for HTML display
+            const formattedMessage = message.replace(/\n/g, '<br>');
+
+            if (sender === 'user') {
+                messageDiv.classList.add('justify-end');
+                messageDiv.innerHTML = `
+                    <div class="bg-gray-600 text-gray-100 p-3 rounded-2xl rounded-br-none max-w-[80%] shadow-lg">
+                        <p>${formattedMessage}</p>
+                    </div>
+                `;
+            } else { // sender === 'bot'
+                messageDiv.classList.add('justify-start');
+                messageDiv.innerHTML = `
+                    <div class="bg-blue-600 text-white p-3 rounded-2xl rounded-bl-none max-w-[80%] shadow-lg">
+                        <p>${formattedMessage}</p>
+                    </div>
+                `;
+            }
+
+            chatBox.appendChild(messageDiv);
+            // Scroll to the bottom of the chat box to show the latest message
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        /**
+         * Generates a response from the bot based on user input.
+         * @param {string} userText - The user's input message.
+         * @returns {string} The bot's response.
+         */
+        function getBotResponse(userText) {
+            // Convert the user's input to lowercase for case-insensitive matching
+            const processedText = userText.toLowerCase().trim();
+
+            // Check if a riddle is currently active
+            if (isRiddleActive) {
+                const currentRiddle = riddles[currentRiddleIndex];
+                if (processedText === currentRiddle.answer.toLowerCase()) {
+                    isRiddleActive = false;
+                    currentRiddleIndex = (currentRiddleIndex + 1) % riddles.length;
+                    return `That's correct! Great job! Would you like another riddle? Type 'riddle' to get the next one.`;
+                } else {
+                    return `That's not it. Give it another try!`;
+                }
+            }
+
+            // Check for other predefined keywords
+            if (processedText.includes('riddle')) {
+                isRiddleActive = true;
+                currentRiddleIndex = (currentRiddleIndex + 1) % riddles.length;
+                return riddles[currentRiddleIndex].riddle;
+            }
+
+            for (const key in botResponses) {
+                if (processedText.includes(key)) {
+                    return botResponses[key];
+                }
+            }
+            
+            // If no keywords are found, provide a generic response
+            return 'I\'m sorry, I don\'t understand that. Can you ask me something else? Type \'menu\' for a list of topics.';
+        }
+
+        /**
+         * Handles the user's message submission.
+         */
+        function handleUserMessage() {
+            const userText = userInput.value.trim();
+            if (userText === '') {
+                return; // Do nothing if the input is empty
+            }
+
+            // Display the user's message
+            addMessageToChat(userText, 'user');
+
+            // Clear the input field for the next message
+            userInput.value = '';
+
+            // Get the bot's response and display it after a short delay to simulate "thinking"
+            setTimeout(() => {
+                const botReply = getBotResponse(userText);
+                addMessageToChat(botReply, 'bot');
+            }, 500); // 500 milliseconds (0.5 seconds) delay
+        }
+
+        // Add event listeners for the send button and the Enter key
+        sendButton.addEventListener('click', handleUserMessage);
+        userInput.addEventListener('keypress', (event) => {
+            // Check if the 'Enter' key was pressed
+            if (event.key === 'Enter') {
+                handleUserMessage();
+            }
+        });
+    </script>
+</body>
+</html>
